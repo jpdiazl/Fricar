@@ -1,0 +1,25 @@
+import React from 'react';
+
+/**
+ * PageShell: contenedor consistente para todas las páginas.
+ * - width: 'narrow' (auth/forms) | 'wide' (default) | 'full'
+ */
+export default function PageShell({ title, subtitle, width = 'wide', actions, children }) {
+  return (
+    <div className="prx-page">
+      <div className={`prx-container prx-container--${width}`}>
+        {(title || subtitle || actions) && (
+          <div className="prx-pageHeader">
+            <div>
+              {title && <h1 className="prx-h1">{title}</h1>}
+              {subtitle && <p className="prx-subtitle">{subtitle}</p>}
+            </div>
+            {actions ? <div className="prx-actions">{actions}</div> : null}
+          </div>
+        )}
+
+        <div className="prx-content">{children}</div>
+      </div>
+    </div>
+  );
+}
