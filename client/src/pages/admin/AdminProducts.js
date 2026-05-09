@@ -173,73 +173,105 @@ export default function AdminProducts() {
   }
 
   return (
-    <PageShell title="Productos" width="wide">
+    <PageShell
+      title="Productos"
+      subtitle="Administra el catálogo y define qué productos aparecen en la portada principal."
+      width="full"
+    >
       {error && <div className="prx-alert prx-alert--error">{error}</div>}
 
-      <form onSubmit={create} className="prx-card" style={{ marginBottom: 12 }}>
-        <div style={{ fontWeight: 800, marginBottom: 10 }}>Crear producto</div>
-        <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-          <div>
-            <label className="prx-label">SKU</label>
-            <input value={form.sku} onChange={update('sku')} className="prx-input" />
+      <section className="product-admin-layout" aria-label="Administrador de productos">
+        <form onSubmit={create} className="product-create-card">
+          <div className="product-section-title">
+            <span className="home-kicker">NUEVO PRODUCTO</span>
+            <h2>Crear producto</h2>
+            <p>Completa los datos principales. Luego puedes agregar imágenes por URL desde la tarjeta del producto.</p>
           </div>
-          <div>
-            <label className="prx-label">Nombre</label>
-            <input value={form.nombre} onChange={update('nombre')} className="prx-input" />
-          </div>
-          <div>
-            <label className="prx-label">Categoría</label>
-            <input value={form.categoria} onChange={update('categoria')} className="prx-input" />
-          </div>
-          <div>
-            <label className="prx-label">Unidad</label>
-            <select value={form.unidad} onChange={update('unidad')} className="prx-input">
-              <option value="">Selecciona unidad…</option>
-              {UNIT_OPTIONS.map((u) => (
-                <option key={u} value={u}>{u}</option>
-              ))}
-            </select>
-          </div>
-          <div style={{ gridColumn: '1 / -1' }}>
-            <label className="prx-label">Descripción</label>
-            <textarea value={form.descripcion} onChange={update('descripcion')} className="prx-input" rows={2} />
-          </div>
-          <label style={checkRow}>
-            <input type="checkbox" checked={form.principalHome} onChange={updateBool('principalHome')} />
-            Mostrar como producto principal en Inicio
-          </label>
-          <label style={checkRow}>
-            <input type="checkbox" checked={form.destacadoHome} onChange={updateBool('destacadoHome')} />
-            Mostrar como producto destacado en Inicio
-          </label>
-        </div>
-        <button className="prx-btn prx-btn--primary" disabled={saving} style={{ marginTop: 12 }}>
-          {saving ? 'Guardando…' : 'Crear'}
-        </button>
-      </form>
 
-      <div className="prx-alert prx-alert--warn" style={{ marginBottom: 12 }}>
-        Para que un producto salga en la portada debe estar <b>activo</b> y marcado como <b>principal</b> o <b>destacado</b>. Si lo desactivas, desaparece de Inicio automáticamente.
-      </div>
+          <div className="product-form-grid">
+            <div>
+              <label className="prx-label" htmlFor="product-sku">SKU</label>
+              <input id="product-sku" value={form.sku} onChange={update('sku')} className="prx-input" />
+            </div>
+            <div>
+              <label className="prx-label" htmlFor="product-name">Nombre</label>
+              <input id="product-name" value={form.nombre} onChange={update('nombre')} className="prx-input" />
+            </div>
+            <div>
+              <label className="prx-label" htmlFor="product-category">Categoría</label>
+              <input id="product-category" value={form.categoria} onChange={update('categoria')} className="prx-input" />
+            </div>
+            <div>
+              <label className="prx-label" htmlFor="product-unit">Unidad</label>
+              <select id="product-unit" value={form.unidad} onChange={update('unidad')} className="prx-input">
+                <option value="">Selecciona unidad…</option>
+                {UNIT_OPTIONS.map((u) => <option key={u} value={u}>{u}</option>)}
+              </select>
+            </div>
+            <div className="product-form-grid__full">
+              <label className="prx-label" htmlFor="product-description">Descripción</label>
+              <textarea id="product-description" value={form.descripcion} onChange={update('descripcion')} className="prx-input prx-textarea" rows={3} />
+            </div>
+          </div>
+
+          <div className="product-checks">
+            <label><input type="checkbox" checked={form.principalHome} onChange={updateBool('principalHome')} /> Producto principal en Inicio</label>
+            <label><input type="checkbox" checked={form.destacadoHome} onChange={updateBool('destacadoHome')} /> Producto destacado en Inicio</label>
+          </div>
+
+          <button className="prx-btn prx-btn--primary" disabled={saving}>{saving ? 'Guardando…' : 'Crear producto'}</button>
+        </form>
+
+        <aside className="product-help-card">
+          <span className="home-kicker">PORTADA</span>
+          <h2>Reglas de visualización</h2>
+          <p>Para aparecer en Inicio, el producto debe estar activo y marcado como principal o destacado.</p>
+          <ul>
+            <li>Si lo desactivas, desaparece automáticamente de la portada.</li>
+            <li>La descripción y foto se toman desde esta misma sección.</li>
+            <li>Solo debe quedar un producto principal y uno destacado.</li>
+          </ul>
+        </aside>
+      </section>
 
       {loading ? (
         <Loader label="Cargando productos..." compact />
       ) : (
-        <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 12 }}>
+        <section className="product-card-grid" aria-label="Listado de productos">
           {items.map((p) => {
             const edit = editing[p._id];
             const isEditing = Boolean(edit);
+            const images = p.images || [];
             return (
-              <div key={p._id} className="prx-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 900 }}>{p.nombre}</div>
-                    <div style={{ color: 'var(--muted)', fontSize: 13 }}>SKU: {p.sku} {p.unidad ? `• Unidad: ${p.unidad}` : ''}</div>
+              <article key={p._id} className="product-admin-card">
+                <header className="product-admin-card__header">
+                  <div className="product-admin-card__title">
+                    <h2>{p.nombre}</h2>
+                    <p>SKU: {p.sku || 'Sin SKU'} {p.unidad ? `• Unidad: ${p.unidad}` : ''}</p>
                   </div>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <div className="product-admin-card__badges">
                     <span className={'prx-badge ' + (p.activo ? 'prx-badge--ok' : 'prx-badge--muted')}>{p.activo ? 'ACTIVO' : 'INACTIVO'}</span>
                     {p.principalHome && <span className="prx-badge prx-badge--ok">PRINCIPAL</span>}
                     {p.destacadoHome && <span className="prx-badge prx-badge--muted">DESTACADO</span>}
+                  </div>
+                </header>
+
+                <div className="product-admin-card__body">
+                  <div className="product-admin-card__preview">
+                    {images[0] ? (
+                      <img src={resolveAssetUrl(images[0].url)} alt={p.nombre} />
+                    ) : (
+                      <div className="product-admin-card__placeholder">Sin foto</div>
+                    )}
+                  </div>
+
+                  <div className="product-admin-card__content">
+                    <p className="product-admin-card__desc">{p.descripcion || 'Sin descripción. Edita este producto para agregar la información que se verá en catálogo e Inicio.'}</p>
+                    <div className="product-admin-card__meta">
+                      {p.categoria && <span>{p.categoria}</span>}
+                      {p.unidad && <span>{p.unidad}</span>}
+                      <span>{images.length} foto{images.length === 1 ? '' : 's'}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -264,29 +296,24 @@ export default function AdminProducts() {
                         {UNIT_OPTIONS.map((u) => <option key={u} value={u}>{u}</option>)}
                       </select>
                     </div>
-                    <div style={{ gridColumn: '1 / -1' }}>
+                    <div className="product-edit-panel__full">
                       <label className="prx-label">Descripción de portada / catálogo</label>
-                      <textarea className="prx-input" rows={4} value={edit.descripcion} onChange={updateEditing(p._id, 'descripcion')} />
+                      <textarea className="prx-input prx-textarea" rows={4} value={edit.descripcion} onChange={updateEditing(p._id, 'descripcion')} />
                     </div>
-                    <label style={checkRow}>
-                      <input type="checkbox" checked={edit.activo} onChange={updateEditing(p._id, 'activo')} />
-                      Producto activo
-                    </label>
-                    <label style={checkRow}>
-                      <input type="checkbox" checked={edit.principalHome} onChange={updateEditing(p._id, 'principalHome')} />
-                      Producto principal en Inicio
-                    </label>
-                    <label style={checkRow}>
-                      <input type="checkbox" checked={edit.destacadoHome} onChange={updateEditing(p._id, 'destacadoHome')} />
-                      Producto destacado en Inicio
-                    </label>
+                    <div className="product-checks product-checks--edit product-edit-panel__full">
+                      <label><input type="checkbox" checked={edit.activo} onChange={updateEditing(p._id, 'activo')} /> Producto activo</label>
+                      <label><input type="checkbox" checked={edit.principalHome} onChange={updateEditing(p._id, 'principalHome')} /> Producto principal en Inicio</label>
+                      <label><input type="checkbox" checked={edit.destacadoHome} onChange={updateEditing(p._id, 'destacadoHome')} /> Producto destacado en Inicio</label>
+                    </div>
                   </div>
                 )}
 
-                <div style={{ marginTop: 12 }}>
-                  <div style={{ fontWeight: 800, marginBottom: 8 }}>Foto del producto / portada (URL)</div>
-
-                  <div style={{ display: 'flex', gap: 8 }}>
+                <section className="product-images-panel" aria-label={`Fotos de ${p.nombre}`}>
+                  <div className="product-images-panel__header">
+                    <strong>Foto del producto / portada</strong>
+                    <span>URL de imagen</span>
+                  </div>
+                  <div className="product-image-add">
                     <input
                       className="prx-input"
                       placeholder="https://..."
@@ -297,41 +324,21 @@ export default function AdminProducts() {
                       Agregar
                     </button>
                   </div>
+                  {images.length ? (
+                    <div className="product-thumb-grid">
+                      {images.map((img) => (
+                        <div key={img._id} className="product-thumb">
+                          <img src={resolveAssetUrl(img.url)} alt="" />
+                          <button type="button" title="Eliminar" onClick={() => removeImage(p, img._id)}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="product-empty-note">Sin imágenes. Si está marcado en Inicio, se mostrará sin foto hasta que agregues una URL.</p>
+                  )}
+                </section>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 8, marginTop: 10 }}>
-                    {(p.images || []).map((img) => (
-                      <div key={img._id} style={{ position: 'relative' }}>
-                        <img
-                          src={resolveAssetUrl(img.url)}
-                          alt=""
-                          style={{ width: '100%', height: 70, objectFit: 'cover', borderRadius: 10, border: '1px solid var(--border)' }}
-                        />
-                        <button
-                          type="button"
-                          title="Eliminar"
-                          onClick={() => removeImage(p, img._id)}
-                          style={{
-                            position: 'absolute',
-                            top: 6,
-                            right: 6,
-                            width: 26,
-                            height: 26,
-                            borderRadius: 999,
-                            border: '1px solid var(--border)',
-                            background: 'var(--surface)',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  {!p.images?.length && <div style={{ marginTop: 8, color: 'var(--muted)', fontSize: 13 }}>Sin imágenes. Si está marcado en Inicio, se mostrará sin foto hasta que agregues una URL.</div>}
-                </div>
-
-                <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+                <footer className="product-actions">
                   {isEditing ? (
                     <>
                       <button type="button" className="prx-btn prx-btn--primary product-action-btn" disabled={savingRow[p._id]} onClick={() => saveProduct(p)}>
@@ -347,7 +354,7 @@ export default function AdminProducts() {
                     </>
                   ) : (
                     <button type="button" className="prx-btn prx-btn--secondary product-action-btn" onClick={() => setEditing((prev) => ({ ...prev, [p._id]: productToEditable(p) }))}>
-                      Editar descripción/datos
+                      Editar datos
                     </button>
                   )}
                   <button type="button" className="prx-btn prx-btn--secondary product-action-btn" onClick={() => toggleActive(p)}>
@@ -362,14 +369,12 @@ export default function AdminProducts() {
                   <button type="button" className="prx-btn prx-btn--danger product-action-btn" onClick={() => deletePermanent(p)}>
                     Eliminar definitivo
                   </button>
-                </div>
-              </div>
+                </footer>
+              </article>
             );
           })}
-        </div>
+        </section>
       )}
     </PageShell>
   );
 }
-
-const checkRow = { display: 'flex', alignItems: 'center', gap: 9, marginTop: 12, color: 'var(--primary)', fontWeight: 850 };
