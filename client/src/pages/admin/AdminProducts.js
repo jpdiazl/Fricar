@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../api/client';
 import PageShell from '../../components/PageShell';
 import resolveAssetUrl from '../../utils/resolveAssetUrl';
+import Loader from '../../components/Loader';
 
 const UNIT_OPTIONS = [
   'Kilo',
@@ -222,7 +223,7 @@ export default function AdminProducts() {
       </div>
 
       {loading ? (
-        <div>Cargando…</div>
+        <Loader label="Cargando productos..." compact />
       ) : (
         <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 12 }}>
           {items.map((p) => {

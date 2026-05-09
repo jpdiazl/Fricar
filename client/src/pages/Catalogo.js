@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../api/client';
 import ProductImageCarousel from '../components/ProductImageCarousel';
 import PageShell from '../components/PageShell';
+import Loader from '../components/Loader';
 
 export default function Catalogo() {
   const [items, setItems] = useState([]);
@@ -27,7 +28,7 @@ export default function Catalogo() {
 
   return (
     <PageShell title="Catálogo" subtitle="Productos disponibles para solicitar cotización. Los valores se informan al responder." width="wide">
-      {loading && <div>Cargando…</div>}
+      {loading && <Loader label="Cargando catálogo..." compact />}
       {error && <div className="prx-alert prx-alert--error">{error}</div>}
 
       <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>

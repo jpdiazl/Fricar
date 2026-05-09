@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import PageShell from '../components/PageShell';
+import Loader from '../components/Loader';
 
 const STATUS_LABELS = {
   PENDIENTE: 'Pendiente',
@@ -94,7 +95,7 @@ export default function Perfil() {
 
       <h2 style={{ marginTop: 18 }}>Mis solicitudes de cotización</h2>
 
-      {loading && <div>Cargando…</div>}
+      {loading && <Loader label="Cargando perfil..." compact />}
 
       <div className="prx-grid prx-grid--cards">
         {quotes.map((q) => (

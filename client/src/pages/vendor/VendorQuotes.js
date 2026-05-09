@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api/client';
 import PageShell from '../../components/PageShell';
+import Loader from '../../components/Loader';
 
 const STATUS_OPTIONS = [
   { value: 'PENDIENTE', label: 'Pendiente' },
@@ -78,7 +79,7 @@ export default function VendorQuotes() {
 
   return (
     <PageShell title="Cotizaciones" subtitle="Gestiona solicitudes, estados y respuestas por correo" width="wide">
-      {loading && <div>Cargando…</div>}
+      {loading && <Loader label="Cargando cotizaciones..." compact />}
       {error && <div className="prx-alert prx-alert--error">{error}</div>}
 
       <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))' }}>

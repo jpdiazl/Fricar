@@ -1,11 +1,12 @@
 import React from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Loader from './Loader';
 
 export default function ProtectedRoute({ children, roles }) {
   const { user, loading } = useAuth();
 
-  if (loading) return <div style={{ padding: 24 }}>Cargando...</div>;
+  if (loading) return <Loader label="Preparando sesión..." />;
   if (!user) return <Navigate to="/login" replace />;
 
   if (roles && roles.length && !roles.includes(user.role)) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api/client';
 import resolveAssetUrl from '../../utils/resolveAssetUrl';
+import Loader from '../../components/Loader';
 
 export default function AdminDashboard() {
   const [data, setData] = useState(null);
@@ -53,7 +54,7 @@ export default function AdminDashboard() {
   return (
     <div style={{ padding: 24, maxWidth: 980, margin: '0 auto' }}>
       <h1>Dashboard</h1>
-      {loading && <div>Cargando…</div>}
+      {loading && <Loader label="Cargando dashboard..." compact />}
       {error && <div style={errorStyle}>{error}</div>}
 
       {data && (

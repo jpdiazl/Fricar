@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api/client';
 import PageShell from '../../components/PageShell';
+import Loader from '../../components/Loader';
 
 export default function VendorContacts() {
   const [items, setItems] = useState([]);
@@ -92,7 +93,7 @@ export default function VendorContacts() {
 
   return (
     <PageShell title="Requerimientos" subtitle="Panel vendedor" width="wide">
-      {loading && <div>Cargando…</div>}
+      {loading && <Loader label="Cargando requerimientos..." compact />}
       {error && <div className="prx-alert prx-alert--error">{error}</div>}
 
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>

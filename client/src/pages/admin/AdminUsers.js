@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../api/client';
 import PageShell from '../../components/PageShell';
 import { formatRut } from '../../utils/rut';
+import Loader from '../../components/Loader';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -130,7 +131,7 @@ export default function AdminUsers() {
         <button disabled={creating} className="prx-btn">{creating ? 'Creando…' : 'Crear'}</button>
       </form>
 
-      {loading && <div>Cargando…</div>}
+      {loading && <Loader label="Cargando usuarios..." compact />}
 
       <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))' }}>
         {users.map((u) => (
