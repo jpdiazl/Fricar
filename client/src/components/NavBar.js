@@ -5,10 +5,12 @@ import { useBranding } from '../contexts/BrandingContext';
 
 const linkStyle = ({ isActive }) => ({
   textDecoration: 'none',
-  padding: '6px 10px',
-  borderRadius: 10,
-  color: isActive ? 'var(--onPrimary)' : 'var(--text)',
-  background: isActive ? 'var(--primary)' : 'transparent'
+  padding: '8px 11px',
+  borderRadius: 999,
+  color: isActive ? 'var(--onPrimary)' : 'var(--primary)',
+  background: isActive ? 'linear-gradient(135deg, var(--primary), var(--secondary))' : 'transparent',
+  fontWeight: 850,
+  fontSize: 14
 });
 
 export default function NavBar() {

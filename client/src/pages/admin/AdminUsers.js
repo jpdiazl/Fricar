@@ -7,6 +7,8 @@ export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [passwords, setPasswords] = useState({});
 
   const [createForm, setCreateForm] = useState({ rut: '', password: '', role: 'VENDEDOR', nombre: '', correo: '', telefono: '' });
   const [creating, setCreating] = useState(false);
@@ -26,13 +28,39 @@ export default function AdminUsers() {
 
   useEffect(() => { load(); }, []);
 
-  async function updateRole(id, role) {
+  async function updateUser(id, payload, message = 'Usuario actualizado') {
     setError('');
+    setSuccess('');
     try {
-      await api.put(`/api/users/${id}`, { role });
+      await api.put(`/api/users/${id}`, payload);
+      setSuccess(message);
       await load();
     } catch (e) {
       setError(e?.response?.data?.error || 'No se pudo actualizar');
+    }
+  }
+
+  async function changePassword(id) {
+    const password = passwords[id] || '';
+    if (password.length < 6) {
+      setError('La nueva contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    await updateUser(id, { password }, 'Contraseña actualizada');
+    setPasswords((prev) => ({ ...prev, [id]: '' }));
+  }
+
+  async function deleteUser(id, name) {
+    const ok = window.confirm(`¿Eliminar al usuario ${name}? Esta acción no se puede deshacer.`);
+    if (!ok) return;
+    setError('');
+    setSuccess('');
+    try {
+      await api.delete(`/api/users/${id}`);
+      setSuccess('Usuario eliminado');
+      await load();
+    } catch (e) {
+      setError(e?.response?.data?.error || 'No se pudo eliminar');
     }
   }
 
@@ -50,9 +78,11 @@ export default function AdminUsers() {
     e.preventDefault();
     setCreating(true);
     setError('');
+    setSuccess('');
     try {
       await api.post('/api/users', createForm);
       setCreateForm({ rut: '', password: '', role: 'VENDEDOR', nombre: '', correo: '', telefono: '' });
+      setSuccess('Usuario creado');
       await load();
     } catch (e) {
       setError(e?.response?.data?.error || 'No se pudo crear');
@@ -62,11 +92,12 @@ export default function AdminUsers() {
   }
 
   return (
-    <PageShell title="Usuarios" width="wide">
+    <PageShell title="Usuarios" subtitle="Administra roles, contraseñas y eliminación de cuentas" width="wide">
       {error && <div className="prx-alert prx-alert--error">{error}</div>}
+      {success && <div className="prx-alert prx-alert--success">{success}</div>}
 
       <form onSubmit={create} className="prx-card" style={{ marginBottom: 12 }}>
-        <div style={{ fontWeight: 800, marginBottom: 10 }}>Crear Vendedor / Admin</div>
+        <div style={{ fontWeight: 900, marginBottom: 10 }}>Crear Vendedor / Admin</div>
         <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
           <div>
             <label className="prx-label">RUT</label>
@@ -103,22 +134,38 @@ export default function AdminUsers() {
 
       <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))' }}>
         {users.map((u) => (
-          <div key={u._id} className="prx-card">
+          <div key={u._id} className="prx-card user-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-              <div style={{ fontWeight: 800 }}>{u.nombre}</div>
-              <span style={pill(u.role)}>{u.role}</span>
+              <div style={{ fontWeight: 900 }}>{u.nombre}</div>
+              <span className={`role-pill role-pill--${u.role}`}>{u.role}</span>
             </div>
-            <div style={{ fontSize: 12, color: '#666' }}>RUT: {u.rut}</div>
-            <div style={{ fontSize: 13, color: '#444', marginTop: 6 }}>{u.correo}</div>
+            <div className="prx-kv">RUT: {u.rut}</div>
+            <div className="prx-kv">{u.correo}</div>
 
             <label className="prx-label">Cambiar rol</label>
-            <select value={u.role} onChange={(e) => updateRole(u._id, e.target.value)} className="prx-input">
+            <select value={u.role} onChange={(e) => updateUser(u._id, { role: e.target.value }, 'Rol actualizado')} className="prx-input">
               <option value="CLIENTE">CLIENTE</option>
               <option value="VENDEDOR">VENDEDOR</option>
               <option value="ADMIN">ADMIN</option>
             </select>
 
-            {u.tipoCliente && <div style={{ fontSize: 12, color: '#666', marginTop: 8 }}>Tipo cliente: {u.tipoCliente}</div>}
+            <label className="prx-label">Nueva contraseña</label>
+            <div className="inline-actions">
+              <input
+                type="password"
+                value={passwords[u._id] || ''}
+                onChange={(e) => setPasswords((prev) => ({ ...prev, [u._id]: e.target.value }))}
+                className="prx-input"
+                placeholder="Mínimo 6 caracteres"
+              />
+              <button type="button" className="prx-btnSecondary" onClick={() => changePassword(u._id)}>Cambiar</button>
+            </div>
+
+            {u.tipoCliente && <div className="prx-kv" style={{ marginTop: 8 }}>Tipo cliente: {u.tipoCliente}</div>}
+
+            <button type="button" className="prx-btnDanger" onClick={() => deleteUser(u._id, u.nombre)}>
+              Eliminar usuario
+            </button>
           </div>
         ))}
       </div>
@@ -126,13 +173,4 @@ export default function AdminUsers() {
       {!loading && users.length === 0 && <div>No hay usuarios.</div>}
     </PageShell>
   );
-}
-
-function pill(role) {
-  const map = {
-    CLIENTE: { background: '#fff8e1', border: '1px solid #ffe0a3' },
-    VENDEDOR: { background: '#e1f2ff', border: '1px solid #a3d8ff' },
-    ADMIN: { background: '#eee', border: '1px solid #ddd' }
-  };
-  return { fontSize: 12, padding: '4px 10px', borderRadius: 999, ...map[role] };
 }

@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { User } from '../models/User.js';
 import { normalizeRut } from '../utils/rut.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -77,6 +78,28 @@ router.post('/login', async (req, res) => {
 
   const token = sign(user);
   return res.json({ token });
+});
+
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(6),
+  newPassword: z.string().min(6)
+});
+
+router.put('/change-password', requireAuth, async (req, res) => {
+  const parsed = changePasswordSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: 'Validación', details: parsed.error.flatten() });
+
+  const user = await User.findById(req.user.id);
+  if (!user) return res.status(401).json({ error: 'No autorizado' });
+
+  const ok = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash);
+  if (!ok) return res.status(400).json({ error: 'La contraseña actual no coincide' });
+
+  user.passwordHash = await bcrypt.hash(parsed.data.newPassword, 10);
+  await user.save();
+
+  return res.json({ ok: true });
 });
 
 router.get('/me', async (req, res) => {

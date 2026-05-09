@@ -74,6 +74,31 @@ router.get('/', requireAuth, requireRole(['VENDEDOR','ADMIN']), async (req, res)
   return res.json({ quotes });
 });
 
+
+const statusSchema = z.object({
+  estado: z.enum(['PENDIENTE', 'ENVIADA', 'EN_PROCESO', 'RESUELTA', 'CERRADA'])
+});
+
+router.patch('/:id/status', requireAuth, requireRole(['VENDEDOR','ADMIN']), async (req, res) => {
+  const parsed = statusSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: 'Validación', details: parsed.error.flatten() });
+
+  const quote = await Quote.findById(req.params.id);
+  if (!quote) return res.status(404).json({ error: 'No encontrado' });
+
+  quote.estado = parsed.data.estado;
+  if (['EN_PROCESO', 'ENVIADA', 'RESUELTA', 'CERRADA'].includes(parsed.data.estado)) {
+    quote.vendedorId = req.user.id;
+  }
+  await quote.save();
+
+  const updated = await Quote.findById(quote._id)
+    .populate('clienteId', '-passwordHash')
+    .populate('items.productId');
+
+  return res.json({ quote: updated });
+});
+
 const sendSchema = z.object({
   notasVendedor: z.string().optional(),
   subject: z.string().optional(),

@@ -39,6 +39,17 @@ router.put('/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
   return res.json({ user });
 });
 
+
+router.delete('/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
+  if (String(req.user.id) === String(req.params.id)) {
+    return res.status(400).json({ error: 'No puedes eliminar tu propio usuario administrador desde este panel' });
+  }
+
+  const user = await User.findByIdAndDelete(req.params.id).select('-passwordHash');
+  if (!user) return res.status(404).json({ error: 'No encontrado' });
+  return res.json({ ok: true, user });
+});
+
 // Admin can create vendor/admin quickly
 const createSchema = z.object({
   rut: z.string().min(3),

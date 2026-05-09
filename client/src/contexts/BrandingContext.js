@@ -2,10 +2,11 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api/client';
 import resolveAssetUrl from '../utils/resolveAssetUrl';
 
-const BrandingContext = createContext({ companyName: 'FRICAR', logoUrl: '' });
+const DEFAULT_LOGO = '/logo-fricar.png';
+const BrandingContext = createContext({ companyName: 'FRICAR', logoUrl: DEFAULT_LOGO });
 
 export function BrandingProvider({ children }) {
-  const [branding, setBranding] = useState({ companyName: 'FRICAR', logoUrl: '' });
+  const [branding, setBranding] = useState({ companyName: 'FRICAR', logoUrl: DEFAULT_LOGO });
 
   const resolveLogoUrl = resolveAssetUrl;
 
@@ -16,7 +17,7 @@ export function BrandingProvider({ children }) {
         if (!mounted) return;
         setBranding({
           companyName: data?.companyName || 'FRICAR',
-          logoUrl: resolveLogoUrl(data?.logoUrl || '')
+          logoUrl: resolveLogoUrl(data?.logoUrl || DEFAULT_LOGO)
         });
       })
       .catch(() => {

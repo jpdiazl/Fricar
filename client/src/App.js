@@ -20,7 +20,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 
 export default function App() {
   return (
-    <div style={{ minHeight: '100vh', background: '#fafafa' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <NavBar />
       <Routes>
         <Route path="/" element={<Home />} />
