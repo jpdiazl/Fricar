@@ -7,6 +7,10 @@ import React from 'react';
 export default function PageShell({ title, subtitle, width = 'wide', actions, children }) {
   return (
     <main className="prx-page">
+      <div className="prx-page__backgroundOrb prx-page__backgroundOrb--left" aria-hidden="true" />
+      <div className="prx-page__backgroundOrb prx-page__backgroundOrb--top" aria-hidden="true" />
+      <div className="prx-page__backgroundDots" aria-hidden="true" />
+
       <div className={`prx-container prx-container--${width}`}>
         {(title || subtitle || actions) && (
           <header className="prx-pageHeader">
