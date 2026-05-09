@@ -8,6 +8,8 @@ const productSchema = new mongoose.Schema(
     categoria: { type: String },
     unidad: { type: String },
     activo: { type: Boolean, default: true },
+    principalHome: { type: Boolean, default: false },
+    destacadoHome: { type: Boolean, default: false },
     images: [
       {
         url: { type: String, required: true },

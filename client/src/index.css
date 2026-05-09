@@ -204,3 +204,196 @@ code { font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', mon
   .profile-layout { grid-template-columns: 1fr; }
   .inline-actions { grid-template-columns: 1fr; }
 }
+
+/* Página principal FRICAR */
+.home-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 34px 16px 46px;
+}
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(340px, .82fr);
+  gap: 34px;
+  align-items: center;
+  margin-bottom: 34px;
+}
+.home-hero h1 {
+  margin: 14px 0 16px;
+  max-width: 650px;
+  font-size: clamp(40px, 5.4vw, 66px);
+  line-height: .98;
+  letter-spacing: -.06em;
+  color: var(--text);
+}
+.home-hero p, .home-card p, .home-product-card p {
+  margin: 0;
+  color: #1c3049;
+  line-height: 1.72;
+}
+.home-kicker {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #e8f1fb;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: 13px;
+  text-decoration: none;
+  font-weight: 950;
+  border: 1px solid var(--border);
+}
+.home-btn--primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; box-shadow: 0 12px 24px rgba(29,59,124,.18); }
+.home-btn--secondary { background: #fff; color: var(--primary); }
+.home-card, .home-product-card {
+  background: rgba(255,255,255,.94);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: var(--shadowSoft);
+}
+.home-card h2, .home-product-card h2, .home-card h3 {
+  margin: 8px 0 14px;
+  color: var(--primary);
+  line-height: 1.18;
+  letter-spacing: -.03em;
+}
+.home-product-card--main {
+  border-radius: 24px;
+  padding: 22px;
+  background: rgba(255,255,255,.92);
+}
+.home-product-main-layout {
+  display: grid;
+  grid-template-columns: minmax(120px, 170px) 1fr;
+  gap: 18px;
+  align-items: center;
+}
+.home-product-image-wrap img { object-fit: contain !important; background: #fff; }
+.home-product-placeholder {
+  height: 190px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  font-weight: 950;
+  background: linear-gradient(135deg, #fff, #eef4fb);
+}
+.home-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.home-tags span {
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #e8f1fb;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 900;
+}
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 34px;
+}
+.home-info-card h2 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  color: var(--primary);
+}
+.home-two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 34px;
+}
+.home-two-cols--compact { align-items: stretch; }
+.home-card--about h2 { color: var(--text); }
+.home-category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 42px;
+  margin-top: 24px;
+  color: #111c2b;
+  font-weight: 650;
+}
+.home-card--blue {
+  background: linear-gradient(135deg, var(--primary), #244f91);
+  color: #fff;
+  border-color: transparent;
+}
+.home-card--blue h2 { color: #fff; margin-top: 0; }
+.home-area-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 28px;
+  margin-top: 18px;
+}
+.home-area-grid span {
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  font-weight: 850;
+}
+.home-footer-cards {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 18px;
+}
+.home-brand-card img {
+  display: block;
+  width: 170px;
+  height: 72px;
+  object-fit: contain;
+  object-position: left center;
+  margin-bottom: 8px;
+}
+@media (max-width: 900px) {
+  .home-hero, .home-two-cols, .home-footer-cards { grid-template-columns: 1fr; }
+  .home-stats { grid-template-columns: 1fr; }
+  .home-product-main-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .home-page { padding-top: 22px; }
+  .home-card, .home-product-card { padding: 18px; }
+  .home-category-grid, .home-area-grid { grid-template-columns: 1fr; gap: 12px; }
+}
+.prx-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+.prx-badge--ok { background: #eaf7ef; color: #166534; border-color: #bfe8ca; }
+.prx-badge--muted { background: #f1f2f4; color: #52565B; border-color: #ddd; }
+.prx-btn--secondary { background: #fff; color: var(--primary); border: 1px solid var(--border); box-shadow: none; }
+.prx-btn--danger { background: #fff1f1; color: var(--accent); border: 1px solid rgba(208,38,43,.28); box-shadow: none; }
+.prx-btn--danger:hover { background: var(--accent); color: #fff; }

@@ -23,7 +23,9 @@ const productSchema = z.object({
   descripcion: z.string().optional(),
   categoria: z.string().optional(),
   unidad: z.string().optional(),
-  activo: z.boolean().optional()
+  activo: z.boolean().optional(),
+  principalHome: z.boolean().optional(),
+  destacadoHome: z.boolean().optional()
 });
 
 // Public catalog (no prices)
@@ -73,6 +75,8 @@ router.post('/', requireAuth, requireRole('ADMIN'), async (req, res) => {
   if (!parsed.success) return res.status(400).json({ error: 'Validación', details: parsed.error.flatten() });
 
   try {
+    if (parsed.data.principalHome) await Product.updateMany({}, { $set: { principalHome: false } });
+    if (parsed.data.destacadoHome) await Product.updateMany({}, { $set: { destacadoHome: false } });
     const created = await Product.create(parsed.data);
     return res.status(201).json({ item: created });
   } catch (e) {
@@ -83,6 +87,13 @@ router.post('/', requireAuth, requireRole('ADMIN'), async (req, res) => {
 router.put('/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
   const parsed = productSchema.partial().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: 'Validación', details: parsed.error.flatten() });
+
+  if (parsed.data.principalHome) {
+    await Product.updateMany({ _id: { $ne: req.params.id } }, { $set: { principalHome: false } });
+  }
+  if (parsed.data.destacadoHome) {
+    await Product.updateMany({ _id: { $ne: req.params.id } }, { $set: { destacadoHome: false } });
+  }
 
   const item = await Product.findByIdAndUpdate(req.params.id, parsed.data, { new: true });
   if (!item) return res.status(404).json({ error: 'No encontrado' });

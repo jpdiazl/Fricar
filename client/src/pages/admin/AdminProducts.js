@@ -22,7 +22,7 @@ export default function AdminProducts() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ sku: '', nombre: '', descripcion: '', categoria: '', unidad: '' });
+  const [form, setForm] = useState({ sku: '', nombre: '', descripcion: '', categoria: '', unidad: '', principalHome: false, destacadoHome: false });
   const [saving, setSaving] = useState(false);
   const [imgUrl, setImgUrl] = useState({}); // per-product url input
 
@@ -45,13 +45,17 @@ export default function AdminProducts() {
     return (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
   }
 
+  function updateBool(key) {
+    return (e) => setForm((prev) => ({ ...prev, [key]: e.target.checked }));
+  }
+
   async function create(e) {
     e.preventDefault();
     setSaving(true);
     setError('');
     try {
       await api.post('/api/products', form);
-      setForm({ sku: '', nombre: '', descripcion: '', categoria: '', unidad: '' });
+      setForm({ sku: '', nombre: '', descripcion: '', categoria: '', unidad: '', principalHome: false, destacadoHome: false });
       await load();
     } catch (e) {
       setError(e?.response?.data?.error || 'No se pudo crear');
@@ -67,6 +71,16 @@ export default function AdminProducts() {
       await load();
     } catch (e) {
       setError(e?.response?.data?.error || 'No se pudo actualizar');
+    }
+  }
+
+  async function toggleHomeFlag(p, field) {
+    setError('');
+    try {
+      await api.put(`/api/products/${p._id}`, { [field]: !p[field] });
+      await load();
+    } catch (e) {
+      setError(e?.response?.data?.error || 'No se pudo actualizar la portada');
     }
   }
 
@@ -137,6 +151,14 @@ export default function AdminProducts() {
             <label className="prx-label">Descripción</label>
             <textarea value={form.descripcion} onChange={update('descripcion')} className="prx-input" rows={2} />
           </div>
+          <label style={checkRow}>
+            <input type="checkbox" checked={form.principalHome} onChange={updateBool('principalHome')} />
+            Mostrar como producto principal en Inicio
+          </label>
+          <label style={checkRow}>
+            <input type="checkbox" checked={form.destacadoHome} onChange={updateBool('destacadoHome')} />
+            Mostrar como producto destacado en Inicio
+          </label>
         </div>
         <button className="prx-btn prx-btn--primary" disabled={saving} style={{ marginTop: 12 }}>
           {saving ? 'Guardando…' : 'Crear'}
@@ -156,6 +178,8 @@ export default function AdminProducts() {
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <span className={'prx-badge ' + (p.activo ? 'prx-badge--ok' : 'prx-badge--muted')}>{p.activo ? 'ACTIVO' : 'INACTIVO'}</span>
+                  {p.principalHome && <span className="prx-badge prx-badge--ok">PRINCIPAL</span>}
+                  {p.destacadoHome && <span className="prx-badge prx-badge--muted">DESTACADO</span>}
                 </div>
               </div>
 
@@ -212,6 +236,12 @@ export default function AdminProducts() {
                 <button type="button" className="prx-btn prx-btn--secondary" onClick={() => toggleActive(p)}>
                   {p.activo ? 'Desactivar' : 'Activar'}
                 </button>
+                <button type="button" className="prx-btn prx-btn--secondary" onClick={() => toggleHomeFlag(p, 'principalHome')}>
+                  {p.principalHome ? 'Quitar principal' : 'Marcar principal'}
+                </button>
+                <button type="button" className="prx-btn prx-btn--secondary" onClick={() => toggleHomeFlag(p, 'destacadoHome')}>
+                  {p.destacadoHome ? 'Quitar destacado' : 'Marcar destacado'}
+                </button>
                 <button type="button" className="prx-btn prx-btn--danger" onClick={() => deletePermanent(p)}>
                   Eliminar definitivo
                 </button>
@@ -223,3 +253,5 @@ export default function AdminProducts() {
     </PageShell>
   );
 }
+
+const checkRow = { display: 'flex', alignItems: 'center', gap: 9, marginTop: 12, color: 'var(--primary)', fontWeight: 850 };

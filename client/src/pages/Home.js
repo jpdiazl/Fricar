@@ -1,119 +1,188 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import api from '../api/client';
+import ProductImageCarousel from '../components/ProductImageCarousel';
 
 const COMPANY = {
   nombre: 'FRICAR',
-  slogan: 'Conectamos productos con propósito',
-  historia:
-    'Desde 1986 entregamos confianza y eficiencia en el abastecimiento de insumos para oficinas, alimentación y operaciones industriales en todo el norte de Chile.',
-  direccion: 'Manzana 14, Galpón 7, Zona Franca Iquique, Chile',
-  telefono: '+56 57 2392825 / 2392826 / 2392827',
-  correo: 'fricar@fricar.cl',
-  web: 'www.fricar.cl'
+  slogan: 'Importamos lo que importa',
+  direccion: 'Manzana 14 Galpón 7, Barrio Industrial Zofri, Iquique',
+  correoVentas: 'ventaschile@fricar.cl',
+  correoLogistica: 'logistica@fricar.cl',
+  telefono: '+56 9 8234 6827'
 };
 
+const AREAS = [
+  'Papel y fotocopia',
+  'Útiles y escritorio',
+  'Abastecimiento institucional',
+  'Productos para operación',
+  'Alimento avícola',
+  'Materias primas'
+];
+
+const CATEGORIES = [
+  'Marcas Torre',
+  'Marcas Artel',
+  'Oficina y escolar',
+  'Papelería',
+  'Alimentación animal',
+  'Importadores y exportadores'
+];
+
 export default function Home() {
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await api.get('/api/products');
+        if (alive) setProducts(data.items || []);
+      } catch {
+        if (alive) setProducts([]);
+      } finally {
+        if (alive) setLoadingProducts(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  const { mainProduct, featuredProduct } = useMemo(() => {
+    const active = (products || []).filter((p) => p?.activo !== false);
+    const main = active.find((p) => p.principalHome) || active[0] || null;
+    const featured = active.find((p) => p.destacadoHome && String(p._id) !== String(main?._id))
+      || active.find((p) => String(p._id) !== String(main?._id))
+      || main
+      || null;
+    return { mainProduct: main, featuredProduct: featured };
+  }, [products]);
+
   return (
-    <div className="prx-page">
-      <div className="prx-container prx-container--wide">
-        <header style={hero}>
-          <div>
-            <div style={kicker}>DESDE 1986</div>
-            <h1 style={title}>{COMPANY.nombre}</h1>
-            <p style={lead}>
-              <b>{COMPANY.slogan}</b> — {COMPANY.historia}
-            </p>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 18 }}>
-              <a href="/catalogo" style={btn}>Ver catálogo</a>
-              <a href="/cotizar" style={btnAlt}>Solicitar cotización</a>
-              <a href="/contacto" style={btnAlt}>Enviar requerimiento</a>
-            </div>
+    <div className="home-page">
+      <section className="home-hero">
+        <div className="home-hero__content">
+          <div className="home-kicker">DESDE 1986</div>
+          <h1>Soluciones comerciales para oficina, papelería, abastecimiento y operación.</h1>
+          <p>
+            FRICAR es una empresa importadora y exportadora con foco en atención comercial,
+            abastecimiento y distribución. Trabajamos líneas de oficina y escolar, productos de
+            marcas reconocidas y abastecimiento para distintas necesidades operativas.
+          </p>
+          <div className="home-actions">
+            <a href="/catalogo" className="home-btn home-btn--primary">Ver catálogo</a>
+            <a href="/cotizar" className="home-btn home-btn--secondary">Solicitar cotización</a>
           </div>
-          <div style={heroCard}>
-            <img src="/logo-fricar.png" alt="FRICAR" style={heroLogo} />
-            <div style={{ fontWeight: 950, marginBottom: 10, color: 'var(--primary)' }}>Contacto comercial</div>
-            <div style={miniLine}><b>Dirección:</b> {COMPANY.direccion}</div>
-            <div style={miniLine}><b>Teléfono:</b> {COMPANY.telefono}</div>
-            <div style={miniLine}><b>Correo:</b> {COMPANY.correo}</div>
-            <div style={{ ...miniLine, marginBottom: 0 }}><b>Web:</b> {COMPANY.web}</div>
-          </div>
-        </header>
-
-        <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
-          <section className="prx-card">
-            <h2 style={h2}>¿Qué hacemos?</h2>
-            <p style={p}>
-              Abastecemos con responsabilidad, eficiencia y cercanía, ofreciendo productos y soluciones de calidad a precios competitivos.
-              Operamos desde Zona Franca de Iquique, con capacidad logística para atender oficinas, instituciones, faenas y operaciones industriales.
-            </p>
-            <p style={p}>
-              Nuestro modelo es simple: tú solicitas, nosotros respondemos por correo con una propuesta clara y, si hace falta, adjuntando PDF.
-            </p>
-          </section>
-
-          <section className="prx-card">
-            <h2 style={h2}>Líneas de abastecimiento</h2>
-            <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--muted)', lineHeight: 1.65 }}>
-              <li><b>Papelería y oficina:</b> resmas, útiles, artículos escolares, limpieza y EPP.</li>
-              <li><b>Alimentos para consumo humano:</b> arroz, fideos, azúcar, harina, aceites y huevos frescos.</li>
-              <li><b>Alimentación animal:</b> insumos para mascotas, producción avícola y ganadera.</li>
-            </ul>
-          </section>
         </div>
 
-        <section className="prx-card" style={{ marginTop: 16 }}>
-          <h2 style={h2}>¿Cómo funciona?</h2>
-          <ol style={{ margin: 0, paddingLeft: 18, color: 'var(--muted)', lineHeight: 1.7 }}>
-            <li><b>Catálogo:</b> revisa productos y arma tu solicitud.</li>
-            <li><b>Cotización:</b> el sistema genera un número automático CTZ.</li>
-            <li><b>Respuesta:</b> un vendedor responde por correo con el detalle y PDF opcional.</li>
-            <li><b>Seguimiento:</b> la cotización puede quedar pendiente, enviada, en proceso o resuelta.</li>
-          </ol>
-        </section>
+        <ProductSpotlight product={mainProduct} loading={loadingProducts} type="principal" />
+      </section>
 
-        <section className="prx-card" style={{ marginTop: 16 }}>
-          <h2 style={h2}>Nuestros pilares</h2>
-          <div className="prx-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
-            <div style={pillCard}>
-              <div style={pillTitle}>Cumplimiento comprobado</div>
-              <div style={pillText}>Puntualidad, responsabilidad y trazabilidad en cada entrega.</div>
-            </div>
-            <div style={pillCard}>
-              <div style={pillTitle}>Precios competitivos</div>
-              <div style={pillText}>Importación directa y proveedores locales para optimizar costos sin sacrificar calidad.</div>
-            </div>
-            <div style={pillCard}>
-              <div style={pillTitle}>Cercanía</div>
-              <div style={pillText}>Trato humano y atención personalizada, con soluciones a medida.</div>
-            </div>
+      <section className="home-stats">
+        <InfoCard title="+39 años" text="de trayectoria comercial, atención a empresas e instituciones y experiencia en abastecimiento." />
+        <InfoCard title="Línea principal" text="Excellent Copy FT 70, papel orientado a impresión y fotocopiado de uso diario." />
+        <InfoCard title="Cobertura comercial" text="Oficina, papelería, escolar, alimentación animal y productos para operación." />
+      </section>
+
+      <section className="home-two-cols">
+        <div className="home-card home-card--about">
+          <div className="home-kicker">QUIÉNES SOMOS</div>
+          <h2>Importación, comercialización y abastecimiento</h2>
+          <p>
+            La empresa está enfocada en el rubro escolar, oficina y papelería, sumando además
+            líneas complementarias para alimentación integral de animales y avícola, además de
+            productos como maíz, harina de soya, harina de carne y aceite.
+          </p>
+          <div className="home-category-grid">
+            {CATEGORIES.map((item) => <span key={item}>{item}</span>)}
           </div>
-        </section>
-      </div>
+        </div>
+
+        <div className="home-card home-card--blue">
+          <h2>Áreas de trabajo</h2>
+          <div className="home-area-grid">
+            {AREAS.map((item) => <span key={item}>{item}</span>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="home-two-cols home-two-cols--compact">
+        <ProductSpotlight product={featuredProduct} loading={loadingProducts} type="destacado" />
+
+        <div className="home-card">
+          <div className="home-kicker">IDENTIDAD VISUAL</div>
+          <h2>Imagen corporativa alineada con la marca</h2>
+          <p>
+            La página fue reorganizada usando la paleta principal de FRICAR, con tonos azules,
+            rojo corporativo y grises definidos en el manual de logo, junto con el eslogan
+            “{COMPANY.slogan}”.
+          </p>
+        </div>
+      </section>
+
+      <section className="home-footer-cards">
+        <div className="home-card home-brand-card">
+          <img src="/logo-fricar.png" alt="FRICAR" />
+          <p>Empresa dedicada al rubro escolar, oficina y papelería, con líneas complementarias para abastecimiento y comercialización.</p>
+        </div>
+        <div className="home-card">
+          <h3>Contacto</h3>
+          <p>{COMPANY.correoVentas}<br />{COMPANY.correoLogistica}<br />{COMPANY.telefono}</p>
+        </div>
+        <div className="home-card">
+          <h3>Ubicación</h3>
+          <p>{COMPANY.direccion}</p>
+        </div>
+      </section>
     </div>
   );
 }
 
-const hero = {
-  display: 'grid',
-  gridTemplateColumns: '1.35fr .85fr',
-  gap: 18,
-  alignItems: 'stretch',
-  marginBottom: 18,
-  padding: '34px clamp(18px, 4vw, 36px)',
-  borderRadius: 28,
-  border: '1px solid var(--border)',
-  background: 'linear-gradient(135deg,#f8fbff 0%,#eef4fb 62%,#ffffff 100%)',
-  boxShadow: 'var(--shadow)'
-};
-const kicker = { display: 'inline-block', background: '#e9f1fb', color: 'var(--secondary)', padding: '8px 12px', borderRadius: 999, fontSize: 12, fontWeight: 950, letterSpacing: '.08em' };
-const title = { margin: '12px 0 10px', fontSize: 'clamp(42px, 7vw, 72px)', lineHeight: .95, letterSpacing: '-.06em', color: 'var(--primary)' };
-const lead = { marginTop: 0, color: 'var(--text)', fontSize: 17, lineHeight: 1.65, maxWidth: 720 };
-const heroCard = { border: '1px solid var(--border)', borderRadius: 24, padding: 18, background: 'rgba(255,255,255,.85)', boxShadow: 'var(--shadowSoft)' };
-const heroLogo = { width: 140, height: 92, objectFit: 'contain', display: 'block', marginBottom: 8 };
-const miniLine = { fontSize: 13, color: 'var(--muted)', marginBottom: 8, lineHeight: 1.45 };
-const h2 = { marginTop: 0, marginBottom: 10, color: 'var(--primary)', letterSpacing: '-.02em' };
-const p = { marginTop: 0, color: 'var(--muted)', lineHeight: 1.65 };
-const btn = { display: 'inline-block', padding: '11px 16px', borderRadius: 999, background: 'linear-gradient(135deg,var(--primary),var(--secondary))', color: '#fff', textDecoration: 'none', fontWeight: 900, boxShadow: '0 10px 20px rgba(29,59,124,.18)' };
-const btnAlt = { ...btn, background: '#fff', color: 'var(--primary)', border: '1px solid var(--border)', boxShadow: 'none' };
-const pillCard = { border: '1px solid var(--border)', borderRadius: 18, padding: 15, background: 'var(--surface2)' };
-const pillTitle = { fontWeight: 950, marginBottom: 6, color: 'var(--primary)' };
-const pillText = { fontSize: 13, color: 'var(--muted)', lineHeight: 1.5 };
+function InfoCard({ title, text }) {
+  return (
+    <div className="home-card home-info-card">
+      <h2>{title}</h2>
+      <p>{text}</p>
+    </div>
+  );
+}
+
+function ProductSpotlight({ product, loading, type }) {
+  const isMain = type === 'principal';
+  const fallbackTitle = isMain ? 'Excellent Copy FT 70' : 'Excellent Copy FT 70';
+  const fallbackText = isMain
+    ? 'Papel de alta calidad para impresiones, desarrollado para uso en impresoras y fotocopiadoras de alta velocidad, con buen desempeño en impresión simple y dúplex.'
+    : 'Excellent Copy es un papel de alta calidad para todo tipo de impresiones. Su ficha indica brillo ISO 96, opacidad objetivo entre 93 y 95 según gramaje, y uso especialmente adaptado a máquinas con principio xerográfico.';
+
+  const title = product?.nombre || fallbackTitle;
+  const description = product?.descripcion || fallbackText;
+  const images = product?.images || [];
+
+  return (
+    <div className={isMain ? 'home-product-card home-product-card--main' : 'home-card home-product-card'}>
+      <div className="home-kicker">{isMain ? 'PRODUCTO PRINCIPAL' : 'PRODUCTO DESTACADO'}</div>
+      {isMain ? (
+        <div className="home-product-main-layout">
+          <div className="home-product-image-wrap">
+            {images.length ? <ProductImageCarousel images={images} alt={title} height={190} /> : <div className="home-product-placeholder">FRICAR</div>}
+          </div>
+          <div>
+            <h2>{title}</h2>
+            <p>{loading ? 'Cargando producto desde el dashboard…' : description}</p>
+            <div className="home-tags">
+              <span>{product?.unidad || '70 g/m²'}</span>
+              <span>{product?.categoria || 'Uso oficina'}</span>
+              <span>{product?.sku ? `SKU ${product.sku}` : 'Cotizable'}</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <h2>{title}</h2>
+          {images.length ? <ProductImageCarousel images={images} alt={title} height={160} /> : null}
+          <p>{loading ? 'Cargando producto desde el dashboard…' : description}</p>
+        </>
+      )}
+    </div>
+  );
+}
