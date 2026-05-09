@@ -68,9 +68,12 @@ export default function NavBar() {
   return (
     <header className="fricar-navbar">
       <div className="fricar-navbar__left">
-        <Link to="/" className="fricar-brand">
-          {logoUrl ? <img src={logoUrl} alt={companyName} className="fricar-brand__logo" /> : null}
-          <div className="fricar-brand__name">{companyName}</div>
+        <Link to="/" className={logoUrl ? 'fricar-brand fricar-brand--withLogo' : 'fricar-brand'}>
+          {logoUrl ? (
+            <img src={logoUrl} alt={companyName || 'FRICAR'} className="fricar-brand__logo" />
+          ) : (
+            <div className="fricar-brand__name">{companyName || 'FRICAR'}</div>
+          )}
         </Link>
         <nav className="fricar-navbar__links">
           {navLinks}

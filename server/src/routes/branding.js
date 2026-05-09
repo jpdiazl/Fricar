@@ -9,7 +9,7 @@ router.get('/public', async (req, res) => {
   const doc = await Branding.findOne({ key: 'main' });
   return res.json({
     companyName: doc?.companyName || 'FRICAR',
-    logoUrl: doc?.logoUrl || '/logo-fricar.png'
+    logoUrl: doc?.logoUrl || ''
   });
 });
 

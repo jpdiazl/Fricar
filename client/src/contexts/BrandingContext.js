@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api/client';
 import resolveAssetUrl from '../utils/resolveAssetUrl';
 
-const DEFAULT_LOGO = '/logo-fricar.png';
+const DEFAULT_LOGO = '';
 const BrandingContext = createContext({ companyName: 'FRICAR', logoUrl: DEFAULT_LOGO });
 
 export function BrandingProvider({ children }) {

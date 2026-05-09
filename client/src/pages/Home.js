@@ -50,11 +50,12 @@ export default function Home() {
 
   const { mainProduct, featuredProduct } = useMemo(() => {
     const active = (products || []).filter((p) => p?.activo !== false);
-    const main = active.find((p) => p.principalHome) || active[0] || null;
-    const featured = active.find((p) => p.destacadoHome && String(p._id) !== String(main?._id))
-      || active.find((p) => String(p._id) !== String(main?._id))
-      || main
-      || null;
+
+    // Solo mostramos productos en Inicio si fueron marcados desde el dashboard.
+    // Si se desactivan o no están marcados, la portada no muestra placeholders ni datos fijos.
+    const main = active.find((p) => p.principalHome) || null;
+    const featured = active.find((p) => p.destacadoHome && String(p._id) !== String(main?._id)) || null;
+
     return { mainProduct: main, featuredProduct: featured };
   }, [products]);
 
@@ -75,7 +76,9 @@ export default function Home() {
           </div>
         </div>
 
-        <ProductSpotlight product={mainProduct} loading={loadingProducts} type="principal" />
+        {(loadingProducts || mainProduct) && (
+          <ProductSpotlight product={mainProduct} loading={loadingProducts} type="principal" />
+        )}
       </section>
 
       <section className="home-stats">
@@ -107,7 +110,9 @@ export default function Home() {
       </section>
 
       <section className="home-two-cols home-two-cols--compact">
-        <ProductSpotlight product={featuredProduct} loading={loadingProducts} type="destacado" />
+        {(loadingProducts || featuredProduct) && (
+          <ProductSpotlight product={featuredProduct} loading={loadingProducts} type="destacado" />
+        )}
 
         <div className="home-card">
           <div className="home-kicker">IDENTIDAD VISUAL</div>
@@ -149,23 +154,23 @@ function InfoCard({ title, text }) {
 
 function ProductSpotlight({ product, loading, type }) {
   const isMain = type === 'principal';
-  const fallbackTitle = isMain ? 'Excellent Copy FT 70' : 'Excellent Copy FT 70';
-  const fallbackText = isMain
-    ? 'Papel de alta calidad para impresiones, desarrollado para uso en impresoras y fotocopiadoras de alta velocidad, con buen desempeño en impresión simple y dúplex.'
-    : 'Excellent Copy es un papel de alta calidad para todo tipo de impresiones. Su ficha indica brillo ISO 96, opacidad objetivo entre 93 y 95 según gramaje, y uso especialmente adaptado a máquinas con principio xerográfico.';
 
-  const title = product?.nombre || fallbackTitle;
-  const description = product?.descripcion || fallbackText;
+  if (!loading && !product) return null;
+
+  const title = product?.nombre || 'Cargando producto…';
+  const description = product?.descripcion || 'Cargando información desde el dashboard…';
   const images = product?.images || [];
 
   return (
     <div className={isMain ? 'home-product-card home-product-card--main' : 'home-card home-product-card'}>
       <div className="home-kicker">{isMain ? 'PRODUCTO PRINCIPAL' : 'PRODUCTO DESTACADO'}</div>
       {isMain ? (
-        <div className="home-product-main-layout">
-          <div className="home-product-image-wrap">
-            {images.length ? <ProductImageCarousel images={images} alt={title} height={190} /> : <div className="home-product-placeholder">FRICAR</div>}
-          </div>
+        <div className={images.length ? 'home-product-main-layout' : 'home-product-main-layout home-product-main-layout--no-image'}>
+          {images.length ? (
+            <div className="home-product-image-wrap">
+              <ProductImageCarousel images={images} alt={title} height={190} />
+            </div>
+          ) : null}
           <div>
             <h2>{title}</h2>
             <p>{loading ? 'Cargando producto desde el dashboard…' : description}</p>

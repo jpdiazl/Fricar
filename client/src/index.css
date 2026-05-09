@@ -397,3 +397,30 @@ code { font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', mon
 .prx-btn--secondary { background: #fff; color: var(--primary); border: 1px solid var(--border); box-shadow: none; }
 .prx-btn--danger { background: #fff1f1; color: var(--accent); border: 1px solid rgba(208,38,43,.28); box-shadow: none; }
 .prx-btn--danger:hover { background: var(--accent); color: #fff; }
+
+/* Ajustes Dashboard Productos */
+.product-edit-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface2);
+}
+.product-action-btn,
+.product-small-btn {
+  width: auto;
+  margin-top: 0;
+}
+
+/* El logo de la navbar se toma solo desde Branding/Dashboard. Si la URL ya trae el texto FRICAR, no se duplica con otro nombre al lado. */
+.fricar-brand--withLogo .fricar-brand__logo {
+  width: auto;
+  max-width: 170px;
+  height: 42px;
+  object-fit: contain;
+  object-position: left center;
+}
+.home-product-main-layout--no-image { grid-template-columns: 1fr; }
