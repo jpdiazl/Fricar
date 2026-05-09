@@ -6,20 +6,20 @@ import React from 'react';
  */
 export default function PageShell({ title, subtitle, width = 'wide', actions, children }) {
   return (
-    <div className="prx-page">
+    <main className="prx-page">
       <div className={`prx-container prx-container--${width}`}>
         {(title || subtitle || actions) && (
-          <div className="prx-pageHeader">
+          <header className="prx-pageHeader">
             <div>
               {title && <h1 className="prx-h1">{title}</h1>}
               {subtitle && <p className="prx-subtitle">{subtitle}</p>}
             </div>
             {actions ? <div className="prx-actions">{actions}</div> : null}
-          </div>
+          </header>
         )}
 
-        <div className="prx-content">{children}</div>
+        <section className="prx-content" aria-label={title || 'Contenido principal'}>{children}</section>
       </div>
-    </div>
+    </main>
   );
 }

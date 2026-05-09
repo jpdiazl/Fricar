@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import ProtectedRoute from './components/ProtectedRoute';
+import GlobalLoader from './components/GlobalLoader';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -21,6 +22,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 export default function App() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+      <GlobalLoader />
       <NavBar />
       <Routes>
         <Route path="/" element={<Home />} />

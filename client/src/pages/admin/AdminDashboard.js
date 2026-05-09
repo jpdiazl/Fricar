@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../api/client';
 import resolveAssetUrl from '../../utils/resolveAssetUrl';
 import Loader from '../../components/Loader';
+import PageShell from '../../components/PageShell';
 
 export default function AdminDashboard() {
   const [data, setData] = useState(null);
@@ -40,7 +41,6 @@ export default function AdminDashboard() {
         companyName: branding.companyName,
         logoUrl: branding.logoUrl
       });
-      // Keep local state in sync
       setBranding((prev) => ({
         ...prev,
         companyName: data?.item?.companyName ?? prev.companyName,
@@ -52,99 +52,76 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 980, margin: '0 auto' }}>
-      <h1>Dashboard</h1>
+    <PageShell
+      title="Dashboard"
+      subtitle="Resumen general del sistema, branding de la empresa y accesos de administración."
+      width="wide"
+    >
       {loading && <Loader label="Cargando dashboard..." compact />}
-      {error && <div style={errorStyle}>{error}</div>}
+      {error && <div className="prx-alert prx-alert--error">{error}</div>}
 
       {data && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-          <Card title="Usuarios" value={data.users} />
-          <Card title="Productos" value={data.products} />
-          <Card title="Cotizaciones" value={data.quotes} />
-          <Card title="Pendientes" value={data.pendingQuotes} />
-          <Card title="Requerimientos" value={data.contacts} />
-        </div>
+        <section className="dashboard-metrics" aria-label="Métricas principales">
+          <MetricCard title="Usuarios" value={data.users} icon="👥" />
+          <MetricCard title="Productos" value={data.products} icon="📦" />
+          <MetricCard title="Cotizaciones" value={data.quotes} icon="🧾" />
+          <MetricCard title="Pendientes" value={data.pendingQuotes} icon="⏳" />
+          <MetricCard title="Requerimientos" value={data.contacts} icon="✉️" />
+        </section>
       )}
 
-      <div style={{ marginTop: 18 }}>
-        <h2 style={{ marginBottom: 10 }}>Branding</h2>
+      <section className="prx-card dashboard-branding" aria-label="Configuración de branding">
+        <div className="dashboard-branding__intro">
+          <span className="home-kicker">Branding</span>
+          <h2>Identidad visual</h2>
+          <p>Configura el nombre y el logo que se mostrarán en la navegación pública del sitio.</p>
+        </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div style={card}>
-            <div style={{ fontWeight: 800, marginBottom: 8 }}>Nombre</div>
+        <div className="dashboard-branding__grid">
+          <label className="dashboard-field">
+            <span className="prx-label">Nombre</span>
             <input
               value={branding.companyName}
               onChange={(e) => setBranding((p) => ({ ...p, companyName: e.target.value }))}
-              style={input}
+              className="prx-input"
             />
-            <button className="prx-btn prx-btn--primary" onClick={saveBranding} disabled={savingBranding} style={{ width: '100%', marginTop: 10 }}>
-              {savingBranding ? 'Guardando…' : 'Guardar'}
-            </button>
-          </div>
+          </label>
 
-          <div style={card}>
-            <div style={{ fontWeight: 800, marginBottom: 8 }}>Logo (URL)</div>
+          <label className="dashboard-field">
+            <span className="prx-label">Logo por URL</span>
             <input
               value={branding.logoUrl}
               onChange={(e) => setBranding((p) => ({ ...p, logoUrl: e.target.value }))}
               placeholder="https://..."
-              style={input}
+              className="prx-input"
             />
-            <div style={{ marginTop: 10, border: '1px solid var(--border)', borderRadius: 12, padding: 12, background: 'var(--surface)' }}>
-              {branding.logoUrl ? (
-                <img src={resolveAssetUrl(branding.logoUrl)} alt="Logo" style={{ maxWidth: '100%', maxHeight: 64, objectFit: 'contain' }} />
-              ) : (
-                <div style={{ color: 'var(--muted)' }}>Pega una URL para ver el preview.</div>
-              )}
-            </div>
-
-            <button className="prx-btn prx-btn--primary" onClick={saveBranding} disabled={savingBranding} style={{ width: '100%', marginTop: 10 }}>
-              {savingBranding ? 'Guardando…' : 'Guardar'}
-            </button>
-          </div>
+          </label>
         </div>
 
-        <p style={{ marginTop: 12, color: 'var(--muted)' }}>
-          Tip: puedes usar URLs de Cloudinary, Google Drive (link directo), o cualquier hosting con HTTPS.
-        </p>
-      </div>
+        <div className="dashboard-logo-preview">
+          {branding.logoUrl ? (
+            <img src={resolveAssetUrl(branding.logoUrl)} alt="Logo" />
+          ) : (
+            <div>Pega una URL para ver el preview del logo.</div>
+          )}
+        </div>
 
-      {/* Texto informativo removido */}
-    </div>
+        <button className="prx-btn prx-btn--primary" onClick={saveBranding} disabled={savingBranding}>
+          {savingBranding ? 'Guardando…' : 'Guardar branding'}
+        </button>
+      </section>
+    </PageShell>
   );
 }
 
-function Card({ title, value }) {
+function MetricCard({ title, value, icon }) {
   return (
-    <div style={card}>
-      <div style={{ color: 'var(--muted)', fontSize: 13 }}>{title}</div>
-      <div style={{ fontSize: 30, fontWeight: 900 }}>{value}</div>
-    </div>
+    <article className="prx-card dashboard-metric-card">
+      <div className="dashboard-metric-card__icon" aria-hidden="true">{icon}</div>
+      <div>
+        <div className="dashboard-metric-card__title">{title}</div>
+        <div className="dashboard-metric-card__value">{value}</div>
+      </div>
+    </article>
   );
 }
-
-const card = {
-  background: 'var(--surface)',
-  border: '1px solid var(--border)',
-  borderRadius: 14,
-  padding: 14
-};
-
-const input = {
-  width: '100%',
-  border: '1px solid var(--border)',
-  borderRadius: 12,
-  padding: '10px 12px',
-  outline: 'none',
-  background: 'var(--surface)',
-  color: 'var(--text)'
-};
-
-const errorStyle = {
-  background: 'rgba(255,0,0,0.08)',
-  border: '1px solid rgba(255,0,0,0.25)',
-  padding: 10,
-  borderRadius: 12,
-  marginTop: 10
-};

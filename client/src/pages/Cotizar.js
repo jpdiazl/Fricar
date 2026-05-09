@@ -3,10 +3,12 @@ import api from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/PageShell';
+import Loader from '../components/Loader';
 
 export default function Cotizar() {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
   const [selected, setSelected] = useState('');
   const [qty, setQty] = useState(1);
   const [items, setItems] = useState([]); // {productId,cantidad}
@@ -16,10 +18,19 @@ export default function Cotizar() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    let alive = true;
     (async () => {
-      const { data } = await api.get('/api/products');
-      setProducts(data.items || []);
+      setLoadingProducts(true);
+      try {
+        const { data } = await api.get('/api/products');
+        if (alive) setProducts(data.items || []);
+      } catch (e) {
+        if (alive) setError(e?.response?.data?.error || 'No se pudieron cargar productos');
+      } finally {
+        if (alive) setLoadingProducts(false);
+      }
     })();
+    return () => { alive = false; };
   }, []);
 
   const selectedProduct = useMemo(
@@ -87,6 +98,8 @@ export default function Cotizar() {
           {user.tipoCliente === 'EMPRESA' && user.razonSocial && <div style={small}><b>Razón Social:</b> {user.razonSocial}</div>}
         </div>
       )}
+
+      {loadingProducts && <Loader label="Cargando productos disponibles..." compact />}
 
       <div className="prx-grid" style={{ alignItems: 'start' }}>
         <div className="prx-card">
